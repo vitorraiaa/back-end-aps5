@@ -1,0 +1,172 @@
+{
+	"info": {
+		"_postman_id": "df3171d5-3640-4dc0-a294-856be186d08f",
+		"name": "APS 5",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "33083071"
+	},
+	"item": [
+		{
+			"name": "read_usuarios",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://127.0.0.1:5000/usuarios"
+			},
+			"response": []
+		},
+		{
+			"name": "read_usuario_especifico",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://127.0.0.1:5000/usuarios/1"
+			},
+			"response": []
+		},
+		{
+			"name": "post_usuarios",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"nome\" : \"Farinha\", \n    \"CPF\" : \"12345678900\",\n    \"data\" : \"18-04-24\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://127.0.0.1:5000/usuarios"
+			},
+			"response": []
+		},
+		{
+			"name": "put_usuarios",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"nome\" : \"Milharal\", \n    \"CPF\" : \"12345678900\",\n    \"data\" : \"18-04-24\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://127.0.0.1:5000/usuarios/1"
+			},
+			"response": []
+		},
+		{
+			"name": "delete_usuarios",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": "http://127.0.0.1:5000/usuarios/1"
+			},
+			"response": []
+		},
+		{
+			"name": "read_bicicleta",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://127.0.0.1:5000/bikes"
+			},
+			"response": []
+		},
+		{
+			"name": "read_bicicleta_especifico",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://127.0.0.1:5000/bikes/1"
+			},
+			"response": []
+		},
+		{
+			"name": "post_bicicleta",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"marca\" : \"nike\",\n    \"modelo\" : \"bike 3000 ultra\",\n    \"cidade\" : \"São BerLondres\", \n    \"status\" : \"disponível\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://127.0.0.1:5000/bikes"
+			},
+			"response": []
+		},
+		{
+			"name": "put_bicicleta",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"marca\" : \"adidas\",\n    \"modelo\" : \"bike 3000 ultra\",\n    \"cidade\" : \"São BerLondres\", \n    \"status\" : \"disponível\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://127.0.0.1:5000/bikes/1"
+			},
+			"response": []
+		},
+		{
+			"name": "delete_bicicleta",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": "http://127.0.0.1:5000/bikes/1"
+			},
+			"response": []
+		},
+		{
+			"name": "read_emprestimos",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://127.0.0.1:5000/emprestimos"
+			},
+			"response": []
+		},
+		{
+			"name": "post_emprestimos",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id_bike\" : 1,\n    \"id_usuario\" : 1,\n    \"data\" : \"19-04-24\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://127.0.0.1:5000/emprestimos/usuarios/1/bikes/1"
+			},
+			"response": []
+		},
+		{
+			"name": "delete_emprestimos",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": "http://127.0.0.1:5000/emprestimos/1"
+			},
+			"response": []
+		}
+	]
+}
