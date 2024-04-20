@@ -1,40 +1,42 @@
 from flask import Flask, request
 from flask_pymongo import PyMongo
+from bson.objectid import ObjectId
 
 app = Flask(__name__)
-app.config["MONGO_URI"] = "mongodb+srv://admin:admin@progeficaz.sdiyyto.mongodb.net/biblioteca_db" #sempre depois da string de conexão, adicionar /nome da base de dados
+app.config["MONGO_URI"] = "mongodb+srv://admin:admin@clusteraps.jnvgfjj.mongodb.net/biblioteca_db" #sempre depois da string de conexão, adicionar /nome da base de dados
 mongo = PyMongo(app, tls=True, tlsAllowInvalidCertificates=True)
 
 @app.route('/usuarios', methods=['POST'])
 def post_user():
-    
     data = request.json
-    filtro = {}
-    projecao = {'_id':0}
-    
-    dados_usuarios = mongo.db.usuarios_aps.find(filtro, projecao)
-    if "cpf" in dados_usuarios:
-        return {"erro": "este cpf ja está cadastrado"}, 400
-    if "cpf" == ' ':
-        return {"erro": "cpf é obrigatório"}, 400
-    
-    result = mongo.db.usuarios_aps.insert_one(data)
+    cpf = data.get('CPF')
 
-    return {"id": str(result.inserted_id)}, 201
+    if cpf is not None:
+        usuario_duplicado = mongo.db.usuarios_aps.find_one({'CPF': cpf})
+        if usuario_duplicado is not None:
+            return {"erro": "CPF já cadastrado"}, 400
+
+    if cpf == "":
+        return {"erro": "CPF não pode ser vazio"}, 400
+
+    result = mongo.db.usuarios_aps.insert_one(data)
+    return {
+        "id": str(result.inserted_id),
+            }, 201
 
 @app.route('/usuarios/<id>', methods=['GET'])
 def get_one_user(id):
     
-    filtro = {'id': id}
+    filtro = {'_id': ObjectId(id)} 
     projecao = {'_id':0}
     
-    dados_usuarios = mongo.db.usuarios_aps.find_one(filtro, projecao)
+    dado_usuario = mongo.db.usuarios_aps.find_one(filtro, projecao)
 
     resp={
-        'usuarios': list(dados_usuarios)
+        'usuarios': dado_usuario
     }
     
-    if dados_usuarios:
+    if dado_usuario:
         return resp, 200
     
     else:
@@ -61,14 +63,14 @@ if __name__ == '__main__':
 def put_user(id):
     
     data = request.json
-    filtro = {'id': id}
-    projecao = {'_id':0}
+    filtro = {'_id': ObjectId(id)}
+    novos_valores = {'$set': data}
     
-    dados_usuarios = mongo.db.usuarios_aps.find_one(filtro, projecao)
+    dados_usuarios = mongo.db.usuarios_aps.find_one(filtro)
     
     if dados_usuarios:
-        result = mongo.db.usuarios_aps.update_one(filtro, {'$set': data})
-        return {"id": str(result.inserted_id)}, 200
+        result = mongo.db.usuarios_aps.update_one(filtro, novos_valores)
+        return {"usuario": result}, 200
     
     else:
         return {"erro": "usuario não encontrado"}, 404
@@ -77,7 +79,7 @@ def put_user(id):
 @app.route('/usuarios/<id>', methods=['DELETE'])
 def delete_user(id):
     
-    filtro = {'id': id}
+    filtro = {'_id': ObjectId(id)} 
     projecao = {'_id':0}
     
     dados_usuarios = mongo.db.usuarios_aps.find_one(filtro, projecao)
@@ -88,3 +90,4 @@ def delete_user(id):
     
     else:
         return {"erro": "usuario não encontrado"}, 404
+    
