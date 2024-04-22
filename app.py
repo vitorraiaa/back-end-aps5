@@ -236,3 +236,5 @@ def delete_loan(id):
     result = mongo.db.emprestimos_aps.delete_one(filtro)
     return {"id": str(result.inserted_id)}, 200
  
+if __name__ == '__main__':
+    app.run(debug=True)
