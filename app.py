@@ -113,9 +113,6 @@ def post_bike():
     if marca == "" or modelo == "" or cidade == "" or status == "":
         return {"erro": "marca, modelo, cidade ou status não pode ser vazio"}, 400
 
-    if status != "disponivel" or status!='disponível' or status != "em uso":
-        return {"erro": "status pode ser apenas 'disponivel' ou 'em uso'" }, 400
-
     result = mongo.db.bikes_aps.insert_one(data)
     return {
         "id": str(result.inserted_id),
@@ -163,8 +160,6 @@ def put_bike(id):
     if marca == "" or modelo == "" or cidade == "" or status == "":
         return {"erro": "marca, modelo, cidade ou status não pode ser vazio"}, 400
 
-    if status != "disponivel" or status!='disponível' or status != "em uso":
-        return {"erro": "status pode ser apenas 'disponivel' ou 'em uso'" }, 400
 
     filtro = {'_id': ObjectId(id)}
     projecao = {'_id':0}
@@ -236,7 +231,7 @@ def delete_loan(id):
         return {"erro": "Empréstimo não encontrado"}, 404
     mongo.db.bikes_aps.update_one({'_id': ObjectId(emprestimo['bike_id'])}, {'$set': {'status': 'disponivel'}})
     result = mongo.db.emprestimos_aps.delete_one(filtro)
-    return {"id": str(result.inserted_id)}, 200
+    return {"mensagem": "emprestimo apagado"}, 200
  
 if __name__ == '__main__':
     app.run(debug=True)
