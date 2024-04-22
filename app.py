@@ -66,8 +66,6 @@ def get_all_users():
     }
     return resp, 200
 
-if __name__ == '__main__':
-    app.run(debug=True)
 
 
 @app.route('/usuarios/<id>', methods=['PUT'])
@@ -90,7 +88,7 @@ def put_user(id):
 
     # Atualizar o usuário
     result = mongo.db.usuarios_aps.update_one(filtro, {'$set': data})
-    return {"id": str(result.inserted_id)}, 200
+    return {"mensagem":'usuario editado'}, 200
     
     
 @app.route('/usuarios/<id>', methods=['DELETE'])
@@ -103,7 +101,7 @@ def delete_user(id):
     
     if dados_usuarios:
         result = mongo.db.usuarios_aps.delete_one(filtro)
-        return {"id": str(result.inserted_id)}, 200
+        return {"mensagem":"usuario apagado"}, 200
     
     else:
         return {"erro": "usuario não encontrado"}, 404
@@ -179,7 +177,7 @@ def put_bike(id):
 
     if dado_bike:
         result = mongo.db.bikes_aps.update_one(filtro, {'$set': data})
-        return {"id": str(result.inserted_id)}, 200
+        return {"mensagem": "bicicleta editada"}, 200
     
     else:
         return {"erro": "bike não encontrada"}, 404
@@ -194,13 +192,12 @@ def delete_bike(id):
     
     if dados_bikes:
         result = mongo.db.bikes_aps.delete_one(filtro)
-        return {"id": str(result.inserted_id)}, 200
+        return {"mensagem":"bicicleta deletada"}, 200
     
     else:
         return {"erro": "bike não encontrada"}, 404
 
-if __name__ == '__main__':
-    app.run(debug=True)  
+
 
 
 @app.route('/usuarios/<id>/emprestimos', methods=['GET'])
@@ -245,6 +242,7 @@ def delete_loan(id):
     if loan is None:
         return {"erro": "Empréstimo não encontrado"}, 404
 
+
     user = User.query.get(loan.user_id)
     user.emprestimos.remove(loan.id)
     db.session.commit()
@@ -253,3 +251,11 @@ def delete_loan(id):
     db.session.commit()
 
     return {"message": "Empréstimo deletado com sucesso"}, 200
+
+    mongo.db.bikes_aps.update_one({'_id': ObjectId(emprestimo['bike_id'])}, {'$set': {'status': 'disponivel'}})
+    result = mongo.db.emprestimos_aps.delete_one(filtro)
+    return {"id": str(result.inserted_id)}, 200
+
+if __name__ == '__main__':
+    app.run(debug=True)   
+ 
