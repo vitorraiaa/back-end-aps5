@@ -8,7 +8,9 @@ app.config["MONGO_URI"] = "mongodb+srv://admin:admin@clusteraps.jnvgfjj.mongodb.
 mongo = PyMongo(app, tls=True, tlsAllowInvalidCertificates=True)
 
 
-
+@app.route('/', methods=['GET'])
+def home():
+    return {"mensagem": "API biblioteca"}, 200
 
 @app.route('/usuarios', methods=['POST'])
 def post_user():
