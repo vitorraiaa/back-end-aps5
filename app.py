@@ -7,6 +7,14 @@ app = Flask(__name__)
 app.config["MONGO_URI"] = "mongodb+srv://admin:admin@clusteraps.jnvgfjj.mongodb.net/biblioteca_db" #sempre depois da string de conexão, adicionar /nome da base de dados
 mongo = PyMongo(app, tls=True, tlsAllowInvalidCertificates=True)
 
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nome = db.Column(db.String(50), nullable=False)
+    cpf = db.Column(db.String(11), nullable=False, unique=True)
+    data_nascimento = db.Column(db.DateTime, nullable=False)
+    emprestimos = db.Column(db.ARRAY(db.Integer))  # Lista de IDs de empréstimos ativos
+
 @app.route('/usuarios', methods=['POST'])
 def post_user():
     data = request.json
@@ -195,44 +203,53 @@ if __name__ == '__main__':
     app.run(debug=True)  
 
 
+@app.route('/usuarios/<id>/emprestimos', methods=['GET'])
+def get_user_loans(id):
+    user = User.query.get(id)
+    if user is None:
+        return {"erro": "Usuário não encontrado"}, 404
+    emprestimos = Loan.query.filter(Loan.id.in_(user.emprestimos)).all()
+    return jsonify([{'user_id': emprestimo.user_id, 'bike_id': emprestimo.bike_id, 'loan_date': emprestimo.loan_date} for emprestimo in emprestimos])
+
 @app.route('/emprestimos', methods=['POST'])
 def post_loan():
     data = request.json
     user_id = data.get('user_id')
     bike_id = data.get('bike_id')
 
-    if user_id is None or bike_id is None:
-        return {"erro": "user_id ou bike_id não pode ser vazio"}, 400
+    user = User.query.get(user_id)
+    if user is None:
+        return {"erro": "Usuário não encontrado"}, 404
 
-    bike = mongo.db.bikes_aps.find_one({'_id': ObjectId(bike_id)})
+    bike = Bike.query.get(bike_id)
     if bike is None:
         return {"erro": "Bicicleta não encontrada"}, 404
 
-    if bike['status'] != 'disponivel':
+    if bike.status != 'disponivel':
         return {"erro": "Bicicleta já está em uso"}, 400
 
-    result = mongo.db.emprestimos_aps.insert_one(data)
-    mongo.db.bikes_aps.update_one({'_id': ObjectId(bike_id)}, {'$set': {'status': 'em uso'}})
-    return {
-        "id": str(result.inserted_id),
-    }, 201
+    loan = Loan(user_id=user_id, bike_id=bike_id)
+    db.session.add(loan)
+    db.session.commit()
 
-@app.route('/emprestimos', methods=['GET'])
-def get_all_loans():
-    filtro = {}
-    projecao = {'_id':0}
-    dados_emprestimos = mongo.db.emprestimos_aps.find(filtro, projecao)
-    resp = {
-        'emprestimos': list(dados_emprestimos)
-    }
-    return resp, 200
+    user.emprestimos.append(loan.id)
+    db.session.commit()
+
+    return {
+        "id": str(loan.id),
+    }, 201
 
 @app.route('/emprestimos/<id>', methods=['DELETE'])
 def delete_loan(id):
-    filtro = {'_id': ObjectId(id)}
-    emprestimo = mongo.db.emprestimos_aps.find_one(filtro)
-    if emprestimo is None:
+    loan = Loan.query.get(id)
+    if loan is None:
         return {"erro": "Empréstimo não encontrado"}, 404
-    mongo.db.bikes_aps.update_one({'_id': ObjectId(emprestimo['bike_id'])}, {'$set': {'status': 'disponivel'}})
-    result = mongo.db.emprestimos_aps.delete_one(filtro)
-    return {"id": str(result.inserted_id)}, 200
+
+    user = User.query.get(loan.user_id)
+    user.emprestimos.remove(loan.id)
+    db.session.commit()
+
+    db.session.delete(loan)
+    db.session.commit()
+
+    return {"message": "Empréstimo deletado com sucesso"}, 200
