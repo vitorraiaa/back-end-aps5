@@ -7,6 +7,9 @@ app = Flask(__name__)
 app.config["MONGO_URI"] = "mongodb+srv://admin:admin@clusteraps.jnvgfjj.mongodb.net/biblioteca_db" #sempre depois da string de conexão, adicionar /nome da base de dados
 mongo = PyMongo(app, tls=True, tlsAllowInvalidCertificates=True)
 
+
+
+
 @app.route('/usuarios', methods=['POST'])
 def post_user():
     data = request.json
@@ -58,8 +61,6 @@ def get_all_users():
     }
     return resp, 200
 
-if __name__ == '__main__':
-    app.run(debug=True)
 
 
 @app.route('/usuarios/<id>', methods=['PUT'])
@@ -82,7 +83,7 @@ def put_user(id):
 
     # Atualizar o usuário
     result = mongo.db.usuarios_aps.update_one(filtro, {'$set': data})
-    return {"id": str(result.inserted_id)}, 200
+    return {"mensagem":'usuario editado'}, 200
     
     
 @app.route('/usuarios/<id>', methods=['DELETE'])
@@ -95,7 +96,7 @@ def delete_user(id):
     
     if dados_usuarios:
         result = mongo.db.usuarios_aps.delete_one(filtro)
-        return {"id": str(result.inserted_id)}, 200
+        return {"mensagem":"usuario apagado"}, 200
     
     else:
         return {"erro": "usuario não encontrado"}, 404
@@ -171,7 +172,7 @@ def put_bike(id):
 
     if dado_bike:
         result = mongo.db.bikes_aps.update_one(filtro, {'$set': data})
-        return {"id": str(result.inserted_id)}, 200
+        return {"mensagem": "bicicleta editada"}, 200
     
     else:
         return {"erro": "bike não encontrada"}, 404
@@ -186,13 +187,12 @@ def delete_bike(id):
     
     if dados_bikes:
         result = mongo.db.bikes_aps.delete_one(filtro)
-        return {"id": str(result.inserted_id)}, 200
+        return {"mensagem":"bicicleta deletada"}, 200
     
     else:
         return {"erro": "bike não encontrada"}, 404
 
-if __name__ == '__main__':
-    app.run(debug=True)  
+
 
 @app.route('/emprestimos', methods=['POST'])
 def post_loan():
@@ -235,3 +235,4 @@ def delete_loan(id):
     mongo.db.bikes_aps.update_one({'_id': ObjectId(emprestimo['bike_id'])}, {'$set': {'status': 'disponivel'}})
     result = mongo.db.emprestimos_aps.delete_one(filtro)
     return {"id": str(result.inserted_id)}, 200
+ 
