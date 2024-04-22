@@ -54,7 +54,7 @@ def get_one_user(id):
 def get_all_users():
     
     filtro = {}
-    projecao = {'_id':0}
+    projecao = {}
     
     dados_usuarios = mongo.db.usuarios_aps.find(filtro, projecao)
 
