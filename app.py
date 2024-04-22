@@ -1,7 +1,7 @@
 from flask import Flask, request
 from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
-from pymongo import MongoClient
+from pymongo import MongoClient 
 
 app = Flask(__name__)
 app.config["MONGO_URI"] = "mongodb+srv://admin:admin@clusteraps.jnvgfjj.mongodb.net/biblioteca_db" #sempre depois da string de conexão, adicionar /nome da base de dados
