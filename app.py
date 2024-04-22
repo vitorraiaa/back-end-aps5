@@ -194,27 +194,29 @@ def delete_bike(id):
 
 
 
-@app.route('/emprestimos', methods=['POST'])
-def post_loan():
-    data = request.json
-    user_id = data.get('user_id')
-    bike_id = data.get('bike_id')
+@app.route('/emprestimos/usuarios/<id_usuario>/bikes/<id_bike>', methods=['POST'])
+def post_loan(id_usuario, id_bike):
 
-    if user_id is None or bike_id is None:
-        return {"erro": "user_id ou bike_id não pode ser vazio"}, 400
+    filtro_usuario = {'_id': ObjectId(id_usuario)}
+    usuario = mongo.db.usuarios_aps.find_one(filtro_usuario)
+    if usuario is None:
+        return {"erro": "Usuário não encontrado"}, 404
 
-    bike = mongo.db.bikes_aps.find_one({'_id': ObjectId(bike_id)})
+    filtro_bike = {'_id': ObjectId(id_bike)}
+    bike = mongo.db.bikes_aps.find_one(filtro_bike)
     if bike is None:
-        return {"erro": "Bicicleta não encontrada"}, 404
+        return {"erro": "Bike não encontrada"}, 404
 
     if bike['status'] != 'disponivel':
-        return {"erro": "Bicicleta já está em uso"}, 400
+        return {"erro": "Bike não disponível"}, 400
 
-    result = mongo.db.emprestimos_aps.insert_one(data)
-    mongo.db.bikes_aps.update_one({'_id': ObjectId(bike_id)}, {'$set': {'status': 'em uso'}})
-    return {
-        "id": str(result.inserted_id),
-    }, 201
+    emprestimo = {
+        'usuario_id': id_usuario,
+        'bike_id': id_bike
+    }
+    result = mongo.db.emprestimos_aps.insert_one(emprestimo)
+    mongo.db.bikes_aps.update_one({'_id': ObjectId(id_bike)}, {'$set': {'status': 'em uso'}})
+    return {"id": str(result.inserted_id)}, 201
 
 @app.route('/emprestimos', methods=['GET'])
 def get_all_loans():
