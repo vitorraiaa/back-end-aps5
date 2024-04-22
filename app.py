@@ -194,7 +194,6 @@ def delete_bike(id):
 if __name__ == '__main__':
     app.run(debug=True)  
 
-
 @app.route('/emprestimos', methods=['POST'])
 def post_loan():
     data = request.json
